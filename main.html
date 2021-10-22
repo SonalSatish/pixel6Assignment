@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript">
+        const logos = {
+            jio: './jio.png',
+            idea: './idea.png',
+            vodafone: './vodafone.png'
+        }
+
+        const states = [
+            "Andhra Pradesh",
+            "Arunachal Pradesh",
+            "Assam",
+            "Bihar",
+            "Chhattisgarh",
+            "Goa",
+            "Gujarat",
+            "Haryana",
+            "Himachal Pradesh",
+            "Jammu and Kashmir",
+            "Jharkhand",
+            "Karnataka",
+            "Kerala",
+            "Madhya Pradesh",
+            "Maharashtra",
+            "Manipur",
+            "Meghalaya",
+            "Mizoram",
+            "Nagaland",
+            "Odisha",
+            "Punjab",
+            "Rajasthan",
+            "Sikkim",
+            "Tamil Nadu",
+            "Telangana",
+            "Tripura",
+            "Uttarakhand",
+            "Uttar Pradesh",
+            "West Bengal",
+            "Andaman and Nicobar Islands",
+            "Chandigarh",
+            "Dadra and Nagar Haveli",
+            "Daman and Diu",
+            "Delhi",
+            "Lakshadweep",
+            "Puducherry"
+        ];
+
+        let otpFailureCount = 0;
+
+        function determineLogo(phoneNumber) {
+            const image = document.getElementById("logo");
+            const serviceProviderCode = parseInt(phoneNumber.slice(0, 3));
+
+            if (serviceProviderCode >= 621 && serviceProviderCode <= 799) {
+                image.src = logos.jio;
+            }
+            if (serviceProviderCode >= 801 && serviceProviderCode <= 920) {
+                image.src = logos.idea;
+            }
+            if (serviceProviderCode >= 921 && serviceProviderCode <= 999) {
+                image.src = logos.vodafone;
+            }
+        }
+
+        function determineState(phoneNumber) {
+            const stateCode = parseInt(phoneNumber.slice(3, 6));
+            const stateElement = document.getElementById("state");
+            if (!isNaN(stateCode)) {
+                stateElement.value = states[stateCode] ? states[stateCode] : '';
+                stateElement.innerHTML = states[stateCode] ? states[stateCode] : '';
+            }
+        }
+
+        function formatPhoneNumber() {
+            const userContactElement = document.getElementById("userContact");
+            if (userContactElement.value.match(/\d/g)) {
+                const phoneNumber = userContactElement.value.match(/\d/g).join('');
+                let formattedNumber = '';
+                if (1 >= phoneNumber.length <= 3) {
+                    formattedNumber += `(${phoneNumber.slice(0, 3)})`
+                }
+                if (4 >= phoneNumber.length <= 6) {
+                    formattedNumber += ` - ${phoneNumber.slice(3, 6)}`
+                }
+                if (7 >= phoneNumber.length <= 10) {
+                    formattedNumber += ` - ${phoneNumber.slice(6, 10)}`
+                }
+                userContactElement.value = formattedNumber.length ? formattedNumber : phoneNumber;
+                determineLogo(phoneNumber)
+                determineState(phoneNumber)
+            } else {
+                userContactElement.value = '';
+            }
+        }
+
+        function createAndStoreOTP() {
+            const hideOTPAt = document.getElementById("secret");
+            hideOTPAt.value = Math.floor(1000 + Math.random() * 9000);
+            console.log(hideOTPAt.value)
+        }
+
+        function submitForm() {
+            createAndStoreOTP();
+            const userInputForm = document.getElementById('userInputForm');
+            userInputForm.style.display = 'none';
+            const otpPage = document.getElementById('otpPage');
+            otpPage.style.visibility = "visible";
+            const userPhone = document.getElementById("userContact").value;
+            const userName = document.getElementById('userName').value.split(' ');
+            const userFirstName = document.getElementById('userFirstName');
+            const userPhoneNumber = document.getElementById('userPhoneNumber');
+            userPhoneNumber.innerHTML = userPhone;
+            userFirstName.innerHTML = userName[0];
+            console.log('OTP page visible', userName[0], userPhone)
+        }
+
+        function validateOTP() {
+            const userOTP = document.getElementById('userProvidedOTP').value;
+            const secretOTP = document.getElementById('secret').value;
+
+            if (parseInt(userOTP) === parseInt(secretOTP)) {
+                const otpPage = document.getElementById('otpPage');
+                otpPage.style.display = 'none';
+                const loginSuccess = document.getElementById('loginSuccess');
+                loginSuccess.style.visibility = 'visible';
+                window.location.href = "http://stackoverflow.com";
+            } else {
+                userOTP.innerHTML = '';
+                const retryMsg = document.getElementById('retryMessage');
+                retryMsg.style.visibility = 'visible';
+                otpFailureCount += 1;
+                if (otpFailureCount === 3) {
+                    window.location.href = "http://google.com";
+                }
+            }
+        }
+
+        function loadPage() {
+            const otpPage = document.getElementById('otpPage');
+            otpPage.style.visibility = 'hidden';
+            const retryMsg = document.getElementById('retryMessage');
+            retryMsg.style.visibility = 'hidden';
+            const loginSuccess = document.getElementById('loginSuccess');
+            loginSuccess.style.visibility = 'hidden';
+        }
+    </script>
+</head>
+
+<body onload="loadPage()">
+    <form id="userInputForm"
+        style="display: flex; flex-direction: column; width: 500px; height: 500px; margin: 0 auto; ">
+        <label>Name:</label>
+        <input type="text" id="userName" pattern="[a-zA-Z]{4,} [a-zA-Z]{4,}" title="firstname lastname and min 4 chars"
+            required />
+
+        <label>Email:</label>
+        <input type="email" id="userEmail" required />
+
+        <label>Phone number:</label>
+        <input type="tel" id="userContact" onkeyup="formatPhoneNumber()" required maxlength="18" />
+        <img id="logo" alt="logo" width="100px" height="100px">
+        <div id="state" value=""></div>
+        <div hidden id="secret" value=""></div>
+
+        <button type="button" id="submitBtn" onclick="submitForm()">Submit</button>
+    </form>
+
+    <div id="otpPage">
+        Dear <span id="userFirstName"></span>,
+        Thank you for your inquiry.
+        A 4 digit verification number has been sent to your phone number: <span id="userPhoneNumber"></span>,
+        please enter in the following box and submit for confirmation:
+        <input type="text" id="userProvidedOTP">
+        <button onclick="validateOTP()">Validate</button>
+        <h2 id="retryMessage">Please try again</h2>
+    </div>
+
+    <div id="loginSuccess">
+        <h2>Validation Successful!</h2>
+    </div>
+
+</body>
+
+</html>
