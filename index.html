@@ -48,32 +48,6 @@
             "Puducherry"
         ];
 
-        let otpFailureCount = 0;
-
-        function determineLogo(phoneNumber) {
-            const image = document.getElementById("logo");
-            const serviceProviderCode = parseInt(phoneNumber.slice(0, 3));
-
-            if (serviceProviderCode >= 621 && serviceProviderCode <= 799) {
-                image.src = logos.jio;
-            }
-            if (serviceProviderCode >= 801 && serviceProviderCode <= 920) {
-                image.src = logos.idea;
-            }
-            if (serviceProviderCode >= 921 && serviceProviderCode <= 999) {
-                image.src = logos.vodafone;
-            }
-        }
-
-        function determineState(phoneNumber) {
-            const stateCode = parseInt(phoneNumber.slice(3, 6));
-            const stateElement = document.getElementById("state");
-            if (!isNaN(stateCode)) {
-                stateElement.value = states[stateCode] ? states[stateCode] : '';
-                stateElement.innerHTML = states[stateCode] ? states[stateCode] : '';
-            }
-        }
-
         function formatPhoneNumber() {
             const userContactElement = document.getElementById("userContact");
             if (userContactElement.value.match(/\d/g)) {
@@ -93,6 +67,30 @@
                 determineState(phoneNumber)
             } else {
                 userContactElement.value = '';
+            }
+        }
+
+        function determineLogo(phoneNumber) {
+            const image = document.getElementById("logo");
+            const middleNumber = parseInt(phoneNumber.slice(0, 3));
+
+            if (middleNumber >= 621 && middleNumber <= 799) {
+                image.src = logos.jio;
+            }
+            if (middleNumber >= 801 && middleNumber <= 920) {
+                image.src = logos.idea;
+            }
+            if (middleNumber >= 921 && middleNumber <= 999) {
+                image.src = logos.vodafone;
+            }
+        }
+
+        function determineState(phoneNumber) {
+            const stateCode = parseInt(phoneNumber.slice(3, 6));
+            const stateElement = document.getElementById("state");
+            if (!isNaN(stateCode)) {
+                stateElement.value = states[stateCode] ? states[stateCode] : '';
+                stateElement.innerHTML = states[stateCode] ? states[stateCode] : '';
             }
         }
 
@@ -117,6 +115,7 @@
             console.log('OTP page visible', userName[0], userPhone)
         }
 
+        let otpFailureCount = 0;
         function validateOTP() {
             const userOTP = document.getElementById('userProvidedOTP').value;
             const secretOTP = document.getElementById('secret').value;
@@ -126,14 +125,14 @@
                 otpPage.style.display = 'none';
                 const loginSuccess = document.getElementById('loginSuccess');
                 loginSuccess.style.visibility = 'visible';
-                window.location.href = "http://stackoverflow.com";
+                window.location.href = "http://pixel6.co/";
             } else {
                 userOTP.innerHTML = '';
                 const retryMsg = document.getElementById('retryMessage');
                 retryMsg.style.visibility = 'visible';
                 otpFailureCount += 1;
                 if (otpFailureCount === 3) {
-                    window.location.href = "http://google.com";
+                    window.location.href = "http://pixel6.co/error";
                 }
             }
         }
